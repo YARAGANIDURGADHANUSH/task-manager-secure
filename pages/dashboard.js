@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-export default function Dashboard() {
+export default function Dashboard(){
 
   const [title,setTitle] = useState("")
   const [description,setDescription] = useState("")
@@ -11,7 +11,6 @@ export default function Dashboard() {
   const [search,setSearch] = useState("")
   const [filter,setFilter] = useState("")
 
-  // load tasks
   const loadTasks = async ()=>{
 
     const res = await fetch(`/api/tasks/list?search=${search}&status=${filter}`)
@@ -23,13 +22,13 @@ export default function Dashboard() {
   }
 
   useEffect(()=>{
-
     loadTasks()
+  },[])
 
+  useEffect(()=>{
+    loadTasks()
   },[search,filter])
 
-
-  // create task
   const createTask = async ()=>{
 
     await fetch("/api/tasks/create",{
@@ -55,8 +54,6 @@ export default function Dashboard() {
 
   }
 
-
-  // delete task
   const deleteTask = async(id)=>{
 
     await fetch("/api/tasks/delete",{
@@ -77,80 +74,80 @@ export default function Dashboard() {
 
   return(
 
-  <div className="container">
+    <div className="container">
 
-    <h1>Task Dashboard</h1>
+      <h1>Task Dashboard</h1>
 
-    <h3>Create Task</h3>
+      <h3>Create Task</h3>
 
-    <input
-    placeholder="Title"
-    value={title}
-    onChange={(e)=>setTitle(e.target.value)}
-    />
+      <input
+      placeholder="Title"
+      value={title}
+      onChange={e=>setTitle(e.target.value)}
+      />
 
-    <input
-    placeholder="Description"
-    value={description}
-    onChange={(e)=>setDescription(e.target.value)}
-    />
+      <input
+      placeholder="Description"
+      value={description}
+      onChange={e=>setDescription(e.target.value)}
+      />
 
-    <select
-    value={status}
-    onChange={(e)=>setStatus(e.target.value)}
-    >
+      <select
+      value={status}
+      onChange={e=>setStatus(e.target.value)}
+      >
 
-      <option value="pending">Pending</option>
-      <option value="completed">Completed</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
 
-    </select>
+      </select>
 
-    <button onClick={createTask}>
+      <button onClick={createTask}>
       Create Task
-    </button>
+      </button>
 
-    <hr/>
+      <hr/>
 
-    <h3>Search Tasks</h3>
+      <h3>Search Tasks</h3>
 
-    <input
-    placeholder="Search by title"
-    onChange={(e)=>setSearch(e.target.value)}
-    />
+      <input
+      placeholder="Search title"
+      onChange={e=>setSearch(e.target.value)}
+      />
 
-    <select
-    onChange={(e)=>setFilter(e.target.value)}
-    >
+      <select
+      onChange={e=>setFilter(e.target.value)}
+      >
 
-      <option value="">All</option>
-      <option value="pending">Pending</option>
-      <option value="completed">Completed</option>
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
 
-    </select>
+      </select>
 
-    <hr/>
+      <hr/>
 
-    <h2>Tasks</h2>
+      <h2>Tasks</h2>
 
-    {tasks.map((task)=>(
+      {tasks.map(task=>(
 
-      <div className="task" key={task._id}>
+        <div className="task" key={task._id}>
 
-        <h3>{task.title}</h3>
+          <h3>{task.title}</h3>
 
-        <p>{task.description}</p>
+          <p>{task.description}</p>
 
-        <p>Status: {task.status}</p>
+          <p>Status: {task.status}</p>
 
-        <button onClick={()=>deleteTask(task._id)}>
+          <button onClick={()=>deleteTask(task._id)}>
           Delete
-        </button>
+          </button>
 
-      </div>
+        </div>
 
-    ))}
+      ))}
 
-  </div>
+    </div>
 
   )
 

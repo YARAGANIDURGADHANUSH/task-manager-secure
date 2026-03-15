@@ -5,9 +5,9 @@ export default function Login(){
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
 
-  const login = async () => {
+  const login = async ()=>{
 
-    await fetch("/api/auth/login",{
+    const res = await fetch("/api/auth/login",{
 
       method:"POST",
 
@@ -19,7 +19,12 @@ export default function Login(){
 
     })
 
-    alert("Login successful")
+    if(res.ok){
+      window.location.href="/dashboard"
+    }
+    else{
+      alert("Invalid email or password")
+    }
 
   }
 
@@ -30,20 +35,20 @@ export default function Login(){
       <h2>Login</h2>
 
       <input
-        placeholder="Email"
-        value={email}
-        onChange={e=>setEmail(e.target.value)}
+      placeholder="Email"
+      value={email}
+      onChange={e=>setEmail(e.target.value)}
       />
 
       <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e=>setPassword(e.target.value)}
+      type="password"
+      placeholder="Password"
+      value={password}
+      onChange={e=>setPassword(e.target.value)}
       />
 
       <button onClick={login}>
-        Login
+      Login
       </button>
 
     </div>
