@@ -2,165 +2,226 @@ import { useState, useEffect } from "react"
 
 export default function Dashboard(){
 
-  const [title,setTitle] = useState("")
-  const [description,setDescription] = useState("")
-  const [status,setStatus] = useState("pending")
+const [title,setTitle] = useState("")
+const [description,setDescription] = useState("")
+const [status,setStatus] = useState("pending")
 
-  const [tasks,setTasks] = useState([])
+const [tasks,setTasks] = useState([])
 
-  const [search,setSearch] = useState("")
-  const [filter,setFilter] = useState("")
+const [search,setSearch] = useState("")
+const [filter,setFilter] = useState("")
 
-  // Load tasks from API
-  const loadTasks = async ()=>{
+const [page,setPage] = useState(1)
+const [totalPages,setTotalPages] = useState(1)
 
-    const res = await fetch(`/api/tasks/list?search=${search}&status=${filter}`)
 
-    const data = await res.json()
+// LOAD TASKS
+const loadTasks = async()=>{
 
-    setTasks(data)
+const res = await fetch(`/api/tasks/list?search=${search}&status=${filter}&page=${page}`)
 
-  }
+const data = await res.json()
 
-  // Load tasks when page opens
-  useEffect(()=>{
-    loadTasks()
-  },[])
+setTasks(data.tasks)
+setTotalPages(data.pages)
 
-  // Create new task
-  const createTask = async ()=>{
+}
 
-    await fetch("/api/tasks/create",{
 
-      method:"POST",
+// AUTO LOAD
+useEffect(()=>{
 
-      headers:{
-        "Content-Type":"application/json"
-      },
+loadTasks()
 
-      body:JSON.stringify({
-        title,
-        description,
-        status
-      })
+},[search,filter,page])
 
-    })
 
-    setTitle("")
-    setDescription("")
+// CREATE TASK
+const createTask = async()=>{
 
-    loadTasks()
+await fetch("/api/tasks/create",{
 
-  }
+method:"POST",
 
-  // Delete task
-  const deleteTask = async(id)=>{
+headers:{
+"Content-Type":"application/json"
+},
 
-    await fetch("/api/tasks/delete",{
+body:JSON.stringify({
+title,
+description,
+status
+})
 
-      method:"POST",
+})
 
-      headers:{
-        "Content-Type":"application/json"
-      },
+setTitle("")
+setDescription("")
 
-      body:JSON.stringify({id})
+loadTasks()
 
-    })
+}
 
-    loadTasks()
 
-  }
+// DELETE TASK
+const deleteTask = async(id)=>{
 
-  return(
+await fetch("/api/tasks/delete",{
 
-    <div className="container">
+method:"POST",
 
-      <h1>Task Dashboard</h1>
+headers:{
+"Content-Type":"application/json"
+},
 
-      {/* Create Task Section */}
+body:JSON.stringify({id})
 
-      <h3>Create Task</h3>
+})
 
-      <input
-      placeholder="Title"
-      value={title}
-      onChange={e=>setTitle(e.target.value)}
-      />
+loadTasks()
 
-      <input
-      placeholder="Description"
-      value={description}
-      onChange={e=>setDescription(e.target.value)}
-      />
+}
 
-      <select
-      value={status}
-      onChange={e=>setStatus(e.target.value)}
-      >
 
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
+return(
 
-      </select>
+<div style={{
+maxWidth:"700px",
+margin:"auto",
+padding:"40px",
+background:"#fff",
+borderRadius:"10px"
+}}>
 
-      <button onClick={createTask}>
-        Create Task
-      </button>
+<h1>Task Dashboard</h1>
 
-      <hr/>
+<h3>Create Task</h3>
 
-      {/* Search Tasks Section */}
+<input
+placeholder="Title"
+value={title}
+onChange={(e)=>setTitle(e.target.value)}
+/>
 
-      <h3>Search Tasks</h3>
+<br/><br/>
 
-      <input
-      placeholder="Search title"
-      value={search}
-      onChange={e=>setSearch(e.target.value)}
-      />
+<input
+placeholder="Description"
+value={description}
+onChange={(e)=>setDescription(e.target.value)}
+/>
 
-      <select
-      value={filter}
-      onChange={e=>setFilter(e.target.value)}
-      >
+<br/><br/>
 
-        <option value="">All</option>
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
+<select
+value={status}
+onChange={(e)=>setStatus(e.target.value)}
+>
 
-      </select>
+<option value="pending">Pending</option>
+<option value="completed">Completed</option>
 
-      <button onClick={loadTasks}>
-        Search Tasks
-      </button>
+</select>
 
-      <hr/>
+<br/><br/>
 
-      {/* Tasks List */}
+<button onClick={createTask}>
+Create Task
+</button>
 
-      <h2>Tasks</h2>
 
-      {tasks.map(task=>(
+<hr/>
 
-        <div className="task" key={task._id}>
 
-          <h3>{task.title}</h3>
+<h3>Search Tasks</h3>
 
-          <p>{task.description}</p>
+<input
+placeholder="Search title"
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+/>
 
-          <p>Status: {task.status}</p>
+<br/><br/>
 
-          <button onClick={()=>deleteTask(task._id)}>
-            Delete
-          </button>
+<select
+value={filter}
+onChange={(e)=>setFilter(e.target.value)}
+>
 
-        </div>
+<option value="">All</option>
+<option value="pending">Pending</option>
+<option value="completed">Completed</option>
 
-      ))}
+</select>
 
-    </div>
 
-  )
+<hr/>
+
+
+<h2>Tasks</h2>
+
+{tasks.map((task)=>(
+
+<div
+key={task._id}
+style={{
+border:"1px solid #ddd",
+padding:"15px",
+marginBottom:"10px",
+borderRadius:"8px"
+}}
+>
+
+<h3>{task.title}</h3>
+
+<p>{task.description}</p>
+
+<p>Status: {task.status}</p>
+
+<button
+onClick={()=>deleteTask(task._id)}
+>
+Delete
+</button>
+
+</div>
+
+))}
+
+
+
+{/* PAGINATION */}
+
+<div style={{
+marginTop:"20px",
+display:"flex",
+gap:"15px",
+alignItems:"center"
+}}>
+
+<button
+disabled={page===1}
+onClick={()=>setPage(page-1)}
+>
+Previous
+</button>
+
+<span>
+Page {page} of {totalPages}
+</span>
+
+<button
+disabled={page===totalPages}
+onClick={()=>setPage(page+1)}
+>
+Next
+</button>
+
+</div>
+
+
+</div>
+
+)
 
 }

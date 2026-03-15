@@ -1,26 +1,37 @@
-import db from "../../../lib/db"
+import dbConnect from "../../../lib/dbConnect"
 import Task from "../../../models/Task"
 
 export default async function handler(req,res){
 
-  await db()
+await dbConnect()
 
-  const { search, status } = req.query
+const { search="", status="", page=1 } = req.query
 
-  let query = {}
+const limit = 5
+const skip = (page-1) * limit
 
-  // search by title
-  if(search && search !== ""){
-    query.title = { $regex: search, $options: "i" }
-  }
+let query = {}
 
-  // filter by status
-  if(status && status !== ""){
-    query.status = status
-  }
+if(search){
+query.title = { $regex: search, $options: "i" }
+}
 
-  const tasks = await Task.find(query).sort({ _id:-1 })
+if(status && status !== ""){
+query.status = status
+}
 
-  res.json(tasks)
+const tasks = await Task.find(query)
+.sort({createdAt:-1})
+.skip(skip)
+.limit(limit)
+
+const total = await Task.countDocuments(query)
+
+res.status(200).json({
+tasks,
+total,
+page:Number(page),
+pages:Math.ceil(total/limit)
+})
 
 }
