@@ -1,45 +1,48 @@
-import {useState} from "react"
+import { useState } from "react"
 
-export default function Register(){
+export default function Register() {
 
- const [email,setEmail]=useState("")
- const [password,setPassword]=useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
- const submit=async()=>{
+  const handleRegister = async () => {
 
-  await fetch("/api/auth/register",{
+    await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    })
 
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
+    alert("Registered Successfully")
 
-   body:JSON.stringify({email,password})
+  }
 
-  })
+  return (
 
- }
+    <div className="container">
 
- return(
+      <h2>Register</h2>
 
-  <div>
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e)=>setEmail(e.target.value)}
+      />
 
-  <h2>Register</h2>
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={(e)=>setPassword(e.target.value)}
+      />
 
-  <input
-  placeholder="email"
-  onChange={e=>setEmail(e.target.value)}
-  />
+      <button onClick={handleRegister}>
+        Register
+      </button>
 
-  <input
-  placeholder="password"
-  onChange={e=>setPassword(e.target.value)}
-  />
+    </div>
 
-  <button onClick={submit}>
-  register
-  </button>
-
-  </div>
-
- )
-
+  )
 }

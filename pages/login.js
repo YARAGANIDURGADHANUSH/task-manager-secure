@@ -1,48 +1,53 @@
-import {useState} from "react"
+import { useState } from "react"
 
 export default function Login(){
 
- const [email,setEmail]=useState("")
- const [password,setPassword]=useState("")
+  const [email,setEmail] = useState("")
+  const [password,setPassword] = useState("")
 
- const login=async()=>{
+  const login = async () => {
 
-  await fetch("/api/auth/login",{
+    await fetch("/api/auth/login",{
 
-   method:"POST",
+      method:"POST",
 
-   headers:{
-    "Content-Type":"application/json"
-   },
+      headers:{
+        "Content-Type":"application/json"
+      },
 
-   body:JSON.stringify({email,password})
+      body:JSON.stringify({email,password})
 
-  })
+    })
 
- }
+    alert("Login successful")
 
- return(
+  }
 
-  <div>
+  return(
 
-  <h2>Login</h2>
+    <div className="container">
 
-  <input
-  placeholder="email"
-  onChange={e=>setEmail(e.target.value)}
-  />
+      <h2>Login</h2>
 
-  <input
-  placeholder="password"
-  onChange={e=>setPassword(e.target.value)}
-  />
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={e=>setEmail(e.target.value)}
+      />
 
-  <button onClick={login}>
-  login
-  </button>
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={e=>setPassword(e.target.value)}
+      />
 
-  </div>
+      <button onClick={login}>
+        Login
+      </button>
 
- )
+    </div>
+
+  )
 
 }
