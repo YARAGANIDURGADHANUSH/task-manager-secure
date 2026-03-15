@@ -15,17 +15,27 @@ const [page,setPage] = useState(1)
 const [totalPages,setTotalPages] = useState(1)
 
 
+
 // LOAD TASKS
 const loadTasks = async()=>{
+
+try{
 
 const res = await fetch(`/api/tasks/list?search=${search}&status=${filter}&page=${page}`)
 
 const data = await res.json()
 
-setTasks(data.tasks)
-setTotalPages(data.pages)
+setTasks(data.tasks || [])
+setTotalPages(data.pages || 1)
+
+}catch(err){
+
+console.log(err)
 
 }
+
+}
+
 
 
 // AUTO LOAD
@@ -36,8 +46,11 @@ loadTasks()
 },[search,filter,page])
 
 
+
 // CREATE TASK
 const createTask = async()=>{
+
+try{
 
 await fetch("/api/tasks/create",{
 
@@ -60,11 +73,20 @@ setDescription("")
 
 loadTasks()
 
+}catch(err){
+
+console.log(err)
+
 }
+
+}
+
 
 
 // DELETE TASK
 const deleteTask = async(id)=>{
+
+try{
 
 await fetch("/api/tasks/delete",{
 
@@ -80,7 +102,14 @@ body:JSON.stringify({id})
 
 loadTasks()
 
+}catch(err){
+
+console.log(err)
+
 }
+
+}
+
 
 
 return(
@@ -94,6 +123,9 @@ borderRadius:"10px"
 }}>
 
 <h1>Task Dashboard</h1>
+
+
+{/* CREATE TASK */}
 
 <h3>Create Task</h3>
 
@@ -133,6 +165,8 @@ Create Task
 <hr/>
 
 
+{/* SEARCH TASKS */}
+
 <h3>Search Tasks</h3>
 
 <input
@@ -158,7 +192,13 @@ onChange={(e)=>setFilter(e.target.value)}
 <hr/>
 
 
+{/* TASK LIST */}
+
 <h2>Tasks</h2>
+
+{tasks.length === 0 && (
+<p>No tasks found</p>
+)}
 
 {tasks.map((task)=>(
 
@@ -218,7 +258,6 @@ Next
 </button>
 
 </div>
-
 
 </div>
 

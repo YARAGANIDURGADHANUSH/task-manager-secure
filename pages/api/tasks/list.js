@@ -1,37 +1,53 @@
 import dbConnect from "../../../lib/dbConnect"
 import Task from "../../../models/Task"
 
-export default async function handler(req,res){
+export default async function handler(req, res) {
 
-await dbConnect()
+  if (req.method !== "GET") {
+    return res.status(405).json({ message: "Method not allowed" })
+  }
 
-const { search="", status="", page=1 } = req.query
+  try {
 
-const limit = 5
-const skip = (page-1) * limit
+    await dbConnect()
 
-let query = {}
+    const { search = "", status = "", page = 1 } = req.query
 
-if(search){
-query.title = { $regex: search, $options: "i" }
-}
+    const limit = 5
+    const skip = (page - 1) * limit
 
-if(status && status !== ""){
-query.status = status
-}
+    let query = {}
 
-const tasks = await Task.find(query)
-.sort({createdAt:-1})
-.skip(skip)
-.limit(limit)
+    if (search) {
+      query.title = { $regex: search, $options: "i" }
+    }
 
-const total = await Task.countDocuments(query)
+    if (status && status !== "") {
+      query.status = status
+    }
 
-res.status(200).json({
-tasks,
-total,
-page:Number(page),
-pages:Math.ceil(total/limit)
-})
+    const tasks = await Task.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+
+    const total = await Task.countDocuments(query)
+
+    res.status(200).json({
+      tasks,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit)
+    })
+
+  } catch (error) {
+
+    console.error(error)
+
+    res.status(500).json({
+      message: "Server error"
+    })
+
+  }
 
 }
