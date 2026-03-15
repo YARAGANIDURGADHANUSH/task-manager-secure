@@ -1,34 +1,26 @@
-import connectDB from "../../../lib/db"
+import db from "../../../lib/db"
 import Task from "../../../models/Task"
-import {verifyToken} from "../../../lib/auth"
 
 export default async function handler(req,res){
 
- await connectDB()
+  await db()
 
- const token = req.cookies.token
+  const { search, status } = req.query
 
- const decoded = verifyToken(token)
+  let query = {}
 
- const page = Number(req.query.page)||1
+  // search by title
+  if(search && search !== ""){
+    query.title = { $regex: search, $options: "i" }
+  }
 
- const search = req.query.search || ""
+  // filter by status
+  if(status && status !== ""){
+    query.status = status
+  }
 
- const status = req.query.status
+  const tasks = await Task.find(query).sort({ _id:-1 })
 
- let query={
-  userId:decoded.userId,
-  title:{$regex:search,$options:"i"}
- }
-
- if(status){
-  query.status=status
- }
-
- const tasks = await Task.find(query)
-  .skip((page-1)*10)
-  .limit(10)
-
- res.json(tasks)
+  res.json(tasks)
 
 }
