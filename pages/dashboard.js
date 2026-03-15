@@ -11,6 +11,7 @@ export default function Dashboard(){
   const [search,setSearch] = useState("")
   const [filter,setFilter] = useState("")
 
+  // Load tasks from API
   const loadTasks = async ()=>{
 
     const res = await fetch(`/api/tasks/list?search=${search}&status=${filter}`)
@@ -21,14 +22,12 @@ export default function Dashboard(){
 
   }
 
+  // Load tasks when page opens
   useEffect(()=>{
     loadTasks()
   },[])
 
-  useEffect(()=>{
-    loadTasks()
-  },[search,filter])
-
+  // Create new task
   const createTask = async ()=>{
 
     await fetch("/api/tasks/create",{
@@ -54,6 +53,7 @@ export default function Dashboard(){
 
   }
 
+  // Delete task
   const deleteTask = async(id)=>{
 
     await fetch("/api/tasks/delete",{
@@ -77,6 +77,8 @@ export default function Dashboard(){
     <div className="container">
 
       <h1>Task Dashboard</h1>
+
+      {/* Create Task Section */}
 
       <h3>Create Task</h3>
 
@@ -103,19 +105,23 @@ export default function Dashboard(){
       </select>
 
       <button onClick={createTask}>
-      Create Task
+        Create Task
       </button>
 
       <hr/>
+
+      {/* Search Tasks Section */}
 
       <h3>Search Tasks</h3>
 
       <input
       placeholder="Search title"
+      value={search}
       onChange={e=>setSearch(e.target.value)}
       />
 
       <select
+      value={filter}
       onChange={e=>setFilter(e.target.value)}
       >
 
@@ -125,7 +131,13 @@ export default function Dashboard(){
 
       </select>
 
+      <button onClick={loadTasks}>
+        Search Tasks
+      </button>
+
       <hr/>
+
+      {/* Tasks List */}
 
       <h2>Tasks</h2>
 
@@ -140,7 +152,7 @@ export default function Dashboard(){
           <p>Status: {task.status}</p>
 
           <button onClick={()=>deleteTask(task._id)}>
-          Delete
+            Delete
           </button>
 
         </div>
